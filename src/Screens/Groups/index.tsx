@@ -1,10 +1,12 @@
 import { StatusBar } from 'expo-status-bar'
 import { StyleSheet, Text, View } from 'react-native'
+import { Button } from '@/components/Button'
 
 export function Groups() {
   return (
     <View style={styles.container}>
       <Text style={styles.textTitle}>Team4u</Text>
+      <Button />
       <StatusBar style="auto" />
     </View>
   )

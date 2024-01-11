@@ -40,10 +40,10 @@ export function NewGroup() {
       <S.Content>
         <S.Icon />
         <Highlight
-          title="Nova turma"
-          subtitle="crie a turma para adicionar as pessoas"
+          title="Novo grupo"
+          subtitle="crie um grupo e adicione seus amigos"
         />
-        <Input placeholder="Nome da turma" onChangeText={setGroup} />
+        <Input placeholder="Nome do grupo" onChangeText={setGroup} />
         <Button title="Criar" onPress={handleNewGroup} />
       </S.Content>
     </S.Container>

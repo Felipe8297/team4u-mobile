@@ -48,7 +48,10 @@ export function Groups() {
   return (
     <S.Container>
       <Header />
-      <Highlight title="Turmas" subtitle="Jogue com a sua turma" />
+      <Highlight
+        title="Team4U"
+        subtitle="Crie grupos para jogar com a galera."
+      />
       {isLoading ? (
         <Loading />
       ) : (
@@ -60,11 +63,11 @@ export function Groups() {
           )}
           contentContainerStyle={groups.length === 0 && { flex: 1 }}
           ListEmptyComponent={() => (
-            <ListEmpty message="Que tal cadastrar a primeira turma?" />
+            <ListEmpty message="Que tal cadastrar o primeiro grupo?" />
           )}
         />
       )}
-      <Button title="Criar nova turma" onPress={handleNewGroup} />
+      <Button title="Criar novo grupo" onPress={handleNewGroup} />
     </S.Container>
   )
 }

@@ -1,6 +1,6 @@
 import * as S from './styles'
 
-import { useEffect, useState, useRef } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { FlatList, Alert, TextInput } from 'react-native'
 import { useRoute, useNavigation } from '@react-navigation/native'
 
@@ -14,11 +14,11 @@ import { ListEmpty } from '@/components/ListEmpty'
 import { Button } from '@/components/Button'
 
 import { AppError } from '@/utils/AppError'
-import { playersGetByGroupAndTeam } from '@/storage/player/playerGetByGroupAndTeam'
+import { playersGetByGroupAndTeam } from '@/storage/player/playersGetByGroupAndTeam'
 import { PlayerStorageDTO } from '@/storage/player/PlayerStorageDTO'
 import { playerRemoveByGroup } from '@/storage/player/playerRemoveByGroup'
-
 import { playerAddByGroup } from '@/storage/player/playerAddByGroup'
+import { groupRemoveByName } from '@/storage/group/groupRemoveByName'
 
 type RouteParams = {
   group: string
@@ -30,7 +30,6 @@ export function Players() {
   const [players, setPlayers] = useState<PlayerStorageDTO[]>([])
 
   const navigation = useNavigation()
-
   const route = useRoute()
 
   const { group } = route.params as RouteParams
@@ -52,9 +51,9 @@ export function Players() {
 
     try {
       await playerAddByGroup(newPlayer, group)
-      fetchPlayersByTeam()
       newPlayerNameInputRef.current?.blur()
       setNewPlayerName('')
+      fetchPlayersByTeam()
     } catch (error) {
       if (error instanceof AppError) {
         Alert.alert('Nova pessoa', error.message)
@@ -71,7 +70,10 @@ export function Players() {
       setPlayers(playersByTeam)
     } catch (error) {
       console.log(error)
-      Alert.alert('Pessoas', 'Não foi possível carregar as pessoas.')
+      Alert.alert(
+        'Pessoas',
+        'Não foi possível carregar as pessoas do time selecionado.',
+      )
     }
   }
 
@@ -87,16 +89,16 @@ export function Players() {
 
   async function groupRemove() {
     try {
-      await handleRemoveGroup()
+      await groupRemoveByName(group)
       navigation.navigate('groups')
     } catch (error) {
       console.log(error)
-      Alert.alert('Remover grupo', 'Não foi possível remover esse grupo.')
+      Alert.alert('Remover Grupo', 'Não foi possível remover o grupo')
     }
   }
 
   async function handleRemoveGroup() {
-    Alert.alert('Romover', 'Deseja remover essa turma?', [
+    Alert.alert('Remover', 'Deseja remover o grupo?', [
       { text: 'Não', style: 'cancel' },
       { text: 'Sim', onPress: () => groupRemove() },
     ])

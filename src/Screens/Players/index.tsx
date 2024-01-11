@@ -1,6 +1,8 @@
+import * as S from './styles'
+
 import { useEffect, useState, useRef } from 'react'
-import { FlatList, Alert } from 'react-native'
-import { useRoute } from '@react-navigation/native'
+import { FlatList, Alert, TextInput } from 'react-native'
+import { useRoute, useNavigation } from '@react-navigation/native'
 
 import { Header } from '@/components/Header'
 import { Highlight } from '@/components/Highlight'
@@ -11,12 +13,12 @@ import { PlayerCard } from '@/components/PlayerCard'
 import { ListEmpty } from '@/components/ListEmpty'
 import { Button } from '@/components/Button'
 
-import * as S from './styles'
 import { AppError } from '@/utils/AppError'
-import { playerAddByGroup } from '@/storage/player/playerAddByGroup'
-
 import { playersGetByGroupAndTeam } from '@/storage/player/playerGetByGroupAndTeam'
 import { PlayerStorageDTO } from '@/storage/player/PlayerStorageDTO'
+import { playerRemoveByGroup } from '@/storage/player/playerRemoveByGroup'
+
+import { playerAddByGroup } from '@/storage/player/playerAddByGroup'
 
 type RouteParams = {
   group: string
@@ -27,9 +29,13 @@ export function Players() {
   const [team, setTeam] = useState('Time A')
   const [players, setPlayers] = useState<PlayerStorageDTO[]>([])
 
+  const navigation = useNavigation()
+
   const route = useRoute()
 
   const { group } = route.params as RouteParams
+
+  const newPlayerNameInputRef = useRef<TextInput>(null)
 
   async function handleAddPlayer() {
     if (newPlayerName.trim().length === 0) {
@@ -47,6 +53,7 @@ export function Players() {
     try {
       await playerAddByGroup(newPlayer, group)
       fetchPlayersByTeam()
+      newPlayerNameInputRef.current?.blur()
       setNewPlayerName('')
     } catch (error) {
       if (error instanceof AppError) {
@@ -68,6 +75,33 @@ export function Players() {
     }
   }
 
+  async function handleRemovePlayer(playerName: string) {
+    try {
+      await playerRemoveByGroup(playerName, group)
+      fetchPlayersByTeam()
+    } catch (error) {
+      console.log(error)
+      Alert.alert('Remover pessoa', 'Não foi possível remover essa pessoa.')
+    }
+  }
+
+  async function groupRemove() {
+    try {
+      await handleRemoveGroup()
+      navigation.navigate('groups')
+    } catch (error) {
+      console.log(error)
+      Alert.alert('Remover grupo', 'Não foi possível remover esse grupo.')
+    }
+  }
+
+  async function handleRemoveGroup() {
+    Alert.alert('Romover', 'Deseja remover essa turma?', [
+      { text: 'Não', style: 'cancel' },
+      { text: 'Sim', onPress: () => groupRemove() },
+    ])
+  }
+
   useEffect(() => {
     fetchPlayersByTeam()
   }, [team])
@@ -80,10 +114,13 @@ export function Players() {
 
       <S.Form>
         <Input
+          inputRef={newPlayerNameInputRef}
           placeholder="Nome da pessoa"
           autoCorrect={false}
           value={newPlayerName}
           onChangeText={setNewPlayerName}
+          onSubmitEditing={handleAddPlayer}
+          returnKeyType="done"
         />
 
         <ButtonIcon icon="add" onPress={handleAddPlayer} />
@@ -110,7 +147,10 @@ export function Players() {
         data={players}
         keyExtractor={(item) => item.name}
         renderItem={({ item }) => (
-          <PlayerCard name={item.name} onRemove={() => console.log('removi')} />
+          <PlayerCard
+            name={item.name}
+            onRemove={() => handleRemovePlayer(item.name)}
+          />
         )}
         ListEmptyComponent={() => (
           <ListEmpty message="Não há pessoas nesse time" />
@@ -122,7 +162,11 @@ export function Players() {
         ]}
       />
 
-      <Button title="Remover Turma" type="secondary" />
+      <Button
+        title="Remover Turma"
+        type="secondary"
+        onPress={handleRemoveGroup}
+      />
     </S.Container>
   )
 }

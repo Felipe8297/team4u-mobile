@@ -1,6 +1,6 @@
 import { StatusBar } from 'react-native'
 
-import { Players } from '@/Screens/Players'
+import { Routes } from '@/Routes'
 
 import { defaultTheme } from '@/theme'
 import { ThemeProvider } from 'styled-components'
@@ -24,7 +24,7 @@ export default function App() {
         backgroundColor="transparent"
         translucent
       />
-      {fontsLoaded ? <Players /> : <Loading />}
+      {fontsLoaded ? <Routes /> : <Loading />}
     </ThemeProvider>
   )
 }

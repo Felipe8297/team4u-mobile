@@ -18,9 +18,9 @@ No geral, o Team4U é um aplicativo útil para gerenciar turmas e times. Com sua
 - React Native Navigation
 - Styled Components
 
-  ## Telas do aplicativo
+## Telas do aplicativo
 
-![Screenshot_1704993933](https://github.com/Felipe8297/team4u-reactnative/assets/60430412/0b074cff-d430-47f7-a6dc-9eaa24dc052c)
-![Screenshot_1704993920](https://github.com/Felipe8297/team4u-reactnative/assets/60430412/0371dc40-2b3f-4f65-a959-e0ffa81cf40d)
-![Screenshot_1704993888](https://github.com/Felipe8297/team4u-reactnative/assets/60430412/7932eb20-1979-405c-9ab6-892c6bdc315d)
 ![Screenshot_1704993836](https://github.com/Felipe8297/team4u-reactnative/assets/60430412/374cafab-eb6c-4925-ae55-2b1f02a08f51)
+![Screenshot_1704993888](https://github.com/Felipe8297/team4u-reactnative/assets/60430412/7932eb20-1979-405c-9ab6-892c6bdc315d)
+![Screenshot_1704993920](https://github.com/Felipe8297/team4u-reactnative/assets/60430412/0371dc40-2b3f-4f65-a959-e0ffa81cf40d) 
+![Screenshot_1704993933](https://github.com/Felipe8297/team4u-reactnative/assets/60430412/0b074cff-d430-47f7-a6dc-9eaa24dc052c)

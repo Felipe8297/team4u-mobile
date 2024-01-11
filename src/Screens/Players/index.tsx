@@ -1,70 +1,91 @@
-import { useState } from 'react'
-
+import { useEffect, useState, useRef } from 'react'
+import { FlatList, Alert } from 'react-native'
 import { useRoute } from '@react-navigation/native'
-import { Alert, FlatList } from 'react-native'
 
-import * as S from './styles'
-
-import { Highlight } from '@/components/Highlight'
 import { Header } from '@/components/Header'
+import { Highlight } from '@/components/Highlight'
 import { ButtonIcon } from '@/components/ButtonIcon'
-import { Input } from '@/components/Input'
 import { Filter } from '@/components/Filter'
+import { Input } from '@/components/Input'
 import { PlayerCard } from '@/components/PlayerCard'
 import { ListEmpty } from '@/components/ListEmpty'
 import { Button } from '@/components/Button'
+
+import * as S from './styles'
 import { AppError } from '@/utils/AppError'
 import { playerAddByGroup } from '@/storage/player/playerAddByGroup'
-import { playerGetByGroup } from '@/storage/player/playersGetByGroup'
 
-interface RouteParams {
+import { playersGetByGroupAndTeam } from '@/storage/player/playerGetByGroupAndTeam'
+import { PlayerStorageDTO } from '@/storage/player/PlayerStorageDTO'
+
+type RouteParams = {
   group: string
 }
 
 export function Players() {
-  const [team, setTeam] = useState('Time A')
   const [newPlayerName, setNewPlayerName] = useState('')
-  const [players, setPlayers] = useState<string[]>([])
+  const [team, setTeam] = useState('Time A')
+  const [players, setPlayers] = useState<PlayerStorageDTO[]>([])
 
   const route = useRoute()
+
   const { group } = route.params as RouteParams
 
   async function handleAddPlayer() {
     if (newPlayerName.trim().length === 0) {
       return Alert.alert(
         'Nova pessoa',
-        'Informe o nome da pessoa para adicionar',
+        'Informe o nome da pessoa para adicionar.',
       )
     }
+
     const newPlayer = {
       name: newPlayerName,
       team,
     }
+
     try {
       await playerAddByGroup(newPlayer, group)
-      const players = await playerGetByGroup(group)
-      console.log(players)
+      fetchPlayersByTeam()
+      setNewPlayerName('')
     } catch (error) {
       if (error instanceof AppError) {
         Alert.alert('Nova pessoa', error.message)
       } else {
         console.log(error)
-        Alert.alert('Nova pessoa', 'Não foi possível adicionar a pessoa')
+        Alert.alert('Nova pessoa', 'Não foi possível adicionar.')
       }
     }
   }
 
+  async function fetchPlayersByTeam() {
+    try {
+      const playersByTeam = await playersGetByGroupAndTeam(group, team)
+      setPlayers(playersByTeam)
+    } catch (error) {
+      console.log(error)
+      Alert.alert('Pessoas', 'Não foi possível carregar as pessoas.')
+    }
+  }
+
+  useEffect(() => {
+    fetchPlayersByTeam()
+  }, [team])
+
   return (
     <S.Container>
       <Header showBackButton />
+
       <Highlight title={group} subtitle="adicione a galera e separe os times" />
 
       <S.Form>
         <Input
           placeholder="Nome da pessoa"
           autoCorrect={false}
+          value={newPlayerName}
           onChangeText={setNewPlayerName}
         />
+
         <ButtonIcon icon="add" onPress={handleAddPlayer} />
       </S.Form>
 
@@ -81,22 +102,27 @@ export function Players() {
           )}
           horizontal
         />
+
         <S.NumberOfPlayers>{players.length}</S.NumberOfPlayers>
       </S.HeaderList>
+
       <FlatList
         data={players}
-        keyExtractor={(item) => item}
+        keyExtractor={(item) => item.name}
         renderItem={({ item }) => (
-          <PlayerCard name={item} onRemove={() => console.log('Removeu')} />
+          <PlayerCard name={item.name} onRemove={() => console.log('removi')} />
         )}
-        ListEmptyComponent={<ListEmpty message="Não há pessoas nesse time" />}
+        ListEmptyComponent={() => (
+          <ListEmpty message="Não há pessoas nesse time" />
+        )}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={[
           { paddingBottom: 100 },
           players.length === 0 && { flex: 1 },
         ]}
       />
-      <Button title="Remover turma" type="secondary" />
+
+      <Button title="Remover Turma" type="secondary" />
     </S.Container>
   )
 }
